@@ -1,0 +1,1 @@
+# Growth-stock-high-volume-short
