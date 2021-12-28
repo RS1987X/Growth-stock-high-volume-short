@@ -16,7 +16,7 @@ from dateutil import parser
 from statsmodels.graphics.tsaplots import plot_acf
 from collections import Counter
 
-data = pd.read_csv('OMXSTO_DLY_KINV_B, 15.csv')
+data = pd.read_csv('OMXSTO_DLY_STORY_B, 15.csv')
 
 time_offset_removed =  data["time"].str[:-6]
 only_date_part = data["time"].str[:-15]
@@ -85,9 +85,9 @@ short_exit_price = data[short_exit_ind]["close"].astype(float).to_frame()
 
 #calculate reutrns
 comm = 0.0002
-slippage = 0.15/100
-long_strat_returns = long_exit_price["close"].div(long_entry_price["close"].values)-1#-comm*2-slippage
-short_strat_returns =  -(short_exit_price["close"].div(short_entry_price["close"].values)-1)#-comm*2-slippage
+slippage = 0.05/100
+long_strat_returns = long_exit_price["close"].div(long_entry_price["close"].values)-1-comm*2-slippage
+short_strat_returns =  -(short_exit_price["close"].div(short_entry_price["close"].values)-1)-comm*2-slippage
 
 long_short_returns =pd.concat([long_strat_returns, short_strat_returns],axis=0) #
 long_short_returns = long_short_returns.sort_index()
