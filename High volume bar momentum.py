@@ -16,7 +16,7 @@ from dateutil import parser
 from statsmodels.graphics.tsaplots import plot_acf
 from collections import Counter
 
-data = pd.read_csv('OMXSTO_DLY_STORY_B, 15.csv')
+data = pd.read_csv('OMXSTO_DLY_BOL, 15.csv')
 
 time_offset_removed =  data["time"].str[:-6]
 only_date_part = data["time"].str[:-15]
@@ -47,7 +47,7 @@ exit_price = exit_price.set_index("DatePart")
 volume = data.groupby(["DatePart"]).sum()["Volume"]
 adv = volume.rolling(20).mean().shift(1)
 
-high_volume_bar = data["Volume"] > 7*data["Volume"].rolling(170).mean().shift(1)
+high_volume_bar = data["Volume"] > 7*data["Volume"].rolling(1000).mean().shift(1)
 bar_return = data["close"]/data["open"]-1
 not_open = (data["TimePart"] != "09:00:00") & (data["TimePart"] != "09:15:00") 
 not_close = (data["TimePart"] != "17:15:00") & (data["TimePart"] != "17:00:00")
@@ -55,8 +55,8 @@ not_close = (data["TimePart"] != "17:15:00") & (data["TimePart"] != "17:00:00")
 long_pos_ind = (bar_return > 0) & high_volume_bar & not_open & not_close
 short_pos_ind = (bar_return < 0) & high_volume_bar & not_open & not_close
 
-long_exit_ind = long_pos_ind.shift(2).fillna(False)
-short_exit_ind = short_pos_ind.shift(2).fillna(False)
+long_exit_ind = long_pos_ind.shift(4).fillna(False)
+short_exit_ind = short_pos_ind.shift(4).fillna(False)
 
 
 # long_pos_ind = long_pos_ind.to_frame()
@@ -68,11 +68,10 @@ short_exit_ind = short_pos_ind.shift(2).fillna(False)
 # short_pos_ind.insert(1,"DatePart",only_date_part)
 # short_pos_ind = short_pos_ind.set_index("DatePart")
 # short_pos_ind.columns = ["pos indicator"]
-
-long_entry_price = data[long_pos_ind]["close"].astype(float).to_frame()
-short_entry_price = data[short_pos_ind]["close"].astype(float).to_frame()
-
-
+#long_entry_price = data[long_pos_ind]["close"].astype(float)
+long_entry_price = (data[long_pos_ind]["open"].astype(float) + data[long_pos_ind]["close"].astype(float) + data[long_pos_ind]["low"].astype(float) + data[long_pos_ind]["high"].astype(float))/4 
+short_entry_price = (data[short_pos_ind]["open"].astype(float) +data[short_pos_ind]["close"].astype(float) + data[short_pos_ind]["low"].astype(float) + data[short_pos_ind]["high"].astype(float))/4
+#short_entry_price = data[short_pos_ind]["close"].astype(float)
 # long_dates = data.iloc[long_entry_price.index]["DatePart"]
 # long_exit_idx = exit_price.index.isin(long_dates)
 # long_exit_price = exit_price[long_exit_idx].astype(float)
@@ -80,14 +79,14 @@ short_entry_price = data[short_pos_ind]["close"].astype(float).to_frame()
 # short_dates = data.iloc[short_entry_price.index]["DatePart"]
 # short_exit_idx = exit_price.index.isin(short_dates)
 # short_exit_price = exit_price[short_exit_idx]
-long_exit_price = data[long_exit_ind]["close"].astype(float).to_frame()
-short_exit_price = data[short_exit_ind]["close"].astype(float).to_frame()
+long_exit_price = data[long_exit_ind]["close"].astype(float) 
+short_exit_price = data[short_exit_ind]["close"].astype(float)
 
 #calculate reutrns
 comm = 0.0002
-slippage = 0.05/100
-long_strat_returns = long_exit_price["close"].div(long_entry_price["close"].values)-1-comm*2-slippage
-short_strat_returns =  -(short_exit_price["close"].div(short_entry_price["close"].values)-1)-comm*2-slippage
+slippage = 0.0/100
+long_strat_returns = long_exit_price.div(long_entry_price.values)-1-comm*2-slippage
+short_strat_returns =  -(short_exit_price.div(short_entry_price.values)-1)-comm*2-slippage
 
 long_short_returns =pd.concat([long_strat_returns, short_strat_returns],axis=0) #
 long_short_returns = long_short_returns.sort_index()
