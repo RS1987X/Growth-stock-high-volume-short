@@ -16,7 +16,7 @@ from datetime import datetime
 from dateutil import parser
 from statsmodels.graphics.tsaplots import plot_acf
 
-tickers = ["EVO", "SINCH", "LATO_B", "KINV_B", "NIBE_B", "EQT", "MIPS", "STORY_B", "SF", "PDX", "SBB_B", "BALD_B", "SAGA_B"]
+tickers = ["EVO", "SINCH", "LATO_B", "KINV_B", "NIBE_B", "EQT", "MIPS", "STORY_B", "SF", "PDX", "SBB_B", "BALD_B", "SAGA_B", "INDT", "LIFCO_B", "LAGR_B"]
 
 for x in tickers:
     
