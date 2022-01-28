@@ -29,7 +29,6 @@ for x in tickers:
     data.insert(1,"DatePart", only_date_part) 
     data.insert(2,"TimePart", only_time_part)
     
-    
     #DAY HIGH and DAY LOWS
     dh = data.groupby('DatePart')["high"].max().to_frame()
     dl = data.groupby('DatePart')["low"].min().to_frame()
